@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\Activity;
+use App\Models\PostView;
 use Illuminate\Support\Facades\Cache;
 
 class DashboardController
@@ -18,8 +19,8 @@ class DashboardController
     ])->count();
 
     // Get view statistics
-    $totalViews = Post::sum('views');
-    $avgViewsPerPost = $totalPosts > 0 ? round($totalViews / $totalPosts) : 0;
+    $totalViews = PostView::count();
+    $avgViewsPerPost = $totalPosts > 0 ? round($totalViews / $totalPosts, 1) : 0;
 
     // Get system metrics
     $systemMetrics = [

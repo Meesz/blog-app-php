@@ -12,4 +12,17 @@ class Post extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function views()
+    {
+        return $this->hasMany(PostView::class);
+    }
+
+    public function addView()
+    {
+        $this->views()->create([
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent()
+        ]);
+    }
 }
