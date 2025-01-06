@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\Activity;
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class PostController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Display a listing of the resource.
      */
@@ -33,7 +36,7 @@ class PostController extends Controller
         $post = Post::create($request->validate([
             'title' => 'required',
             'content' => 'required',
-        ]));
+        ]) + ['user_id' => auth()->id()]);
 
         Activity::create([
             'description' => "Created post: {$post->title}",
@@ -59,6 +62,7 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
+        $this->authorize('update', $post);
         return view('posts.edit', compact('post'));
     }
 
@@ -67,12 +71,17 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        $post->update($request->validate([
-            'title' => 'required',
-            'content' => 'required',
-        ]));
+        $this->authorize('update', $post);
 
-        return redirect()->route('posts.index');
+        $validated = $request->validate([
+            'title' => 'required|max:255',
+            'content' => 'required'
+        ]);
+
+        $post->update($validated);
+
+        return redirect()->route('posts.index')
+            ->with('success', 'Post updated successfully.');
     }
 
     /**
@@ -80,8 +89,12 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
+        $this->authorize('delete', $post);
+
         $post->delete();
-        return redirect()->route('posts.index');
+
+        return redirect()->route('posts.index')
+            ->with('success', 'Post deleted successfully.');
     }
 
     public function updateOrder(Request $request)
