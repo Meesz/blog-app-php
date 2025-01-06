@@ -54,6 +54,17 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
+        // Only count view if IP hasn't viewed in last 24 hours
+        $ipAddress = request()->ip();
+        $hasViewed = $post->views()
+            ->where('ip_address', $ipAddress)
+            ->where('created_at', '>=', now()->subHours(24))
+            ->exists();
+
+        if (!$hasViewed) {
+            $post->addView();
+        }
+
         return view('posts.show', compact('post'));
     }
 
