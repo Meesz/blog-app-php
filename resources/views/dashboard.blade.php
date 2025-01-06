@@ -106,7 +106,19 @@
                         @foreach($recentActivities as $activity)
                             <div class="flex items-center p-4 bg-gray-50 rounded-lg animate-fade-in">
                                 <div class="flex-shrink-0">
-                                    <span class="inline-block h-2 w-2 rounded-full bg-green-400"></span>
+                                    @switch($activity->type)
+                                        @case('post_created')
+                                            <span class="inline-block h-2 w-2 rounded-full bg-green-400"></span>
+                                            @break
+                                        @case('post_updated')
+                                            <span class="inline-block h-2 w-2 rounded-full bg-blue-400"></span>
+                                            @break
+                                        @case('post_deleted')
+                                            <span class="inline-block h-2 w-2 rounded-full bg-red-400"></span>
+                                            @break
+                                        @default
+                                            <span class="inline-block h-2 w-2 rounded-full bg-gray-400"></span>
+                                    @endswitch
                                 </div>
                                 <div class="ml-4">
                                     <p class="text-sm font-medium text-gray-900">{{ $activity->description }}</p>

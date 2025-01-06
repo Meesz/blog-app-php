@@ -91,6 +91,14 @@ class PostController extends Controller
 
         $post->update($validated);
 
+        Activity::create([
+            'description' => "Updated post: {$post->title}",
+            'type' => 'post_updated',
+            'subject_type' => Post::class,
+            'subject_id' => $post->id,
+            'user_id' => auth()->id()
+        ]);
+
         return redirect()->route('posts.index')
             ->with('success', 'Post updated successfully.');
     }
@@ -101,6 +109,16 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         $this->authorize('delete', $post);
+
+        $title = $post->title; // Store title before deletion
+
+        Activity::create([
+            'description' => "Deleted post: {$title}",
+            'type' => 'post_deleted',
+            'subject_type' => Post::class,
+            'subject_id' => $post->id,
+            'user_id' => auth()->id()
+        ]);
 
         $post->delete();
 
